@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oclc-api-bulk-updater"
+description = "The beginnings of a generic bulk-updater for assorted OCLC APIs."
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = ["oclc", "worldshare", "api"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "requests",
+    "pyjq",
+    "python-dotenv"
+]
+dynamic = ["version"]
