@@ -111,9 +111,12 @@ def updatePatron(userId, moddedRecord, etag, authtoken):
 with open('mod.jq', 'r') as file:
     MODJQ = file.read()
 
-BASEURL = "https://42886.share.worldcat.org/idaas/scim/v2"
+BASEURL = "https://%s.share.worldcat.org/idaas/scim/v2" %INSTID
 
 SEARCHURL = BASEURL + '/Users/.search'
+
+# old token to test refresh
+# TOKEN = "tk_vziB66LUGsTrc0MRpml5yo4VYoKWUPTvUXfj"
 
 TOKEN = getToken()
 
@@ -136,7 +139,7 @@ for line in sys.stdin:
     try:
         patron = readPatron(ppid, TOKEN)
         # for debugging
-        patronJson = json.dumps(patron.json(), ensure_ascii=False)
+        patronJson = json.dumps(patron.json())
     except ValueError:
         # token has expired, get a fresh token and redo read
         print('getting new token')
@@ -147,7 +150,7 @@ for line in sys.stdin:
     ETag = patron.headers['ETag']
 
     # Create modded record with MODJQ
-    modded = json.dumps(pyjq.one(MODJQ, patron.json()), ensure_ascii=False)
+    modded = json.dumps(pyjq.one(MODJQ, patron.json()))
 
     # Update patron record
     try:

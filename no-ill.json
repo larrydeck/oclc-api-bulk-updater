@@ -1,0 +1,90 @@
+{
+    "schemas": [
+        "urn:ietf:params:scim:schemas:core:2.0:User",
+        "urn:mace:oclc.org:eidm:schema:persona:additionalinfo:20180501",
+        "urn:mace:oclc.org:eidm:schema:persona:correlationinfo:20180101",
+        "urn:mace:oclc.org:eidm:schema:persona:persona:20180305",
+        "urn:mace:oclc.org:eidm:schema:persona:wmscircpatroninfo:20180101",
+        "urn:mace:oclc.org:eidm:schema:persona:wsillinfo:20180101"
+    ],
+    "id": "33ca0963-c330-40a9-8496-236dc86af45e",
+    "externalId": "11212001161452",
+    "userName": "NOT SUPPORTED",
+    "name": {
+        "familyName": "Haughton",
+        "givenName": "Samuel"
+    },
+    "emails": [
+        {
+            "value": "samuel.haughton7@gmail.com",
+            "type": "home",
+            "primary": true
+        }
+    ],
+    "addresses": [
+        {
+            "streetAddress": "4982 Queen Mary\napt. 28",
+            "locality": "Montreal",
+            "region": "Québec",
+            "postalCode": "H3W 1X2",
+            "type": "home",
+            "primary": true
+        }
+    ],
+    "urn:mace:oclc.org:eidm:schema:persona:additionalinfo:20180501": {
+        "oclcKeyValuePairs": [
+            {
+                "businessContext": "Circulation_Info",
+                "key": "customdata1",
+                "value": ""
+            },
+            {
+                "businessContext": "Circulation_Info",
+                "key": "customdata2",
+                "value": ""
+            }
+        ]
+    },
+    "urn:mace:oclc.org:eidm:schema:persona:correlationinfo:20180101": {
+        "correlationInfo": [
+            {
+                "sourceSystem": "urn:mace:oclc:idm:concordialibraries",
+                "idAtSource": "999f0ebf-ceef-4c7d-82ab-a9cebb92b485"
+            }
+        ]
+    },
+    "urn:mace:oclc.org:eidm:schema:persona:persona:20180305": {
+        "oclcPPID": "33ca0963-c330-40a9-8496-236dc86af45e",
+        "institutionId": "42886",
+        "oclcNamespace": "urn:oclc:platform:42886",
+        "oclcUsername": "11212001161452",
+        "oclcExpirationDate": "2035-12-31T00:00:00Z",
+        "nameInfoCanSelfEdit": false
+    },
+    "urn:mace:oclc.org:eidm:schema:persona:wmscircpatroninfo:20180101": {
+        "circulationInfo": {
+            "barcode": "11212001161452",
+            "borrowerCategory": "CU - Alumni",
+            "homeBranch": "264731",
+            "circRegistrationDate": "2022-09-26",
+            "isCircBlocked": false,
+            "isCollectionExempt": false,
+            "isFineExempt": false,
+            "isVerified": true,
+            "storeCheckoutHistory": false
+        }
+    },
+    "urn:mace:oclc.org:eidm:schema:persona:wsillinfo:20180101": {
+        "illInfo": {
+            "isBlocked": false,
+            "isApproved": false
+        }
+    },
+    "meta": {
+        "resourceType": "User",
+        "created": "2022-09-26T19:40:01Z",
+        "lastModified": "2022-09-26T19:42:01Z",
+        "location": "https://42886.share.worldcat.org/idaas/scim/v2/Users/33ca0963-c330-40a9-8496-236dc86af45e",
+        "version": "\"e05f865f77a6e327684a12f70a6c25b2\""
+    }
+}
