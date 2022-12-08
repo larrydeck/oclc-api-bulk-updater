@@ -77,7 +77,7 @@ def readPatron(userId, authtoken):
         read = requests.get(readurl, headers=readheaders)
         read.raise_for_status()
     except requests.exceptions.HTTPError as err:
-        if s.status_code == 401:
+        if read.status_code == 401:
             raise ValueError('Token expired')
         else:
             SystemExit(err)
@@ -119,58 +119,43 @@ TOKEN = getToken()
 
 
 # LOOP
-
-# barcode = "41212005480118"
+# take identifiers from stdin
 
 for line in sys.stdin:
     barcode = line.strip()
 
+    # find patron's PPID using barcode
     try:
-        uid =  searchPatron(barcode, TOKEN)
+        ppid =  searchPatron(barcode, TOKEN)
     except ValueError:
+        # token has expired, get a fresh token and redo search
         print('getting new token')
         TOKEN = getToken()
-        uid =  searchPatron(barcode, TOKEN)
+        ppid =  searchPatron(barcode, TOKEN)
 
     try:
-        patron = readPatron(uid, TOKEN)
+        patron = readPatron(ppid, TOKEN)
+        # for debugging
+        patronJson = json.dumps(patron.json(), ensure_ascii=False)
     except ValueError:
+        # token has expired, get a fresh token and redo read
         print('getting new token')
         TOKEN = getToken()
-        patron = readPatron(uid, TOKEN)
+        patron = readPatron(ppid, TOKEN)
 
-
+    # Extract ETag for safe update
     ETag = patron.headers['ETag']
 
+    # Create modded record with MODJQ
     modded = json.dumps(pyjq.one(MODJQ, patron.json()), ensure_ascii=False)
 
+    # Update patron record
     try:
-        update = updatePatron(uid, modded, ETag, TOKEN)
+        update = updatePatron(ppid, modded, ETag, TOKEN)
+        # print simple confirmation
         print(str(barcode) + "\t" + str(update.status_code))
     except ValueError:
+        # token has expired, get a fresh token and redo update
         print('update getting new token')
         TOKEN = getToken()
-        update = updatePatron(uid, modded, ETag, TOKEN)
-
-    
-
-
-    '''
-    readRecord = json.dumps(patron.json(), ensure_ascii=False)
-
-    readfile = 'changes/' + barcode + '-read.json'
-
-    with open(readfile, 'w', encoding='utf-8') as rf:
-        rf.write(readRecord)
-
-        rf.close()
-
-    modfile = 'changes/' + barcode + '-mod.json'
-
-    modRecord = json.dumps(pyjq.one(MODJQ, patron.json()), ensure_ascii=False)
-
-    with open(modfile, 'w', encoding='utf-8') as mf:
-        mf.write(modRecord)
-
-        mf.close()
-    '''
+        update = updatePatron(ppid, modded, ETag, TOKEN)
