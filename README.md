@@ -34,8 +34,19 @@ WSKEY=NVuKm3Z...bRty4m
 SECRET=MnVZt...3jwkL
 INSTID=12345
 ```
+## Basic usage
+Assuming you have your `.env` set up properly and a list of patron barcodes in `patrons.txt`:
 
+```bash
+python3 idm-update.py < patrons.txt
+```
 
+will respond, on success, with output like
 
+```bash
+12345678 200
+12345679 200
+...
+```
 
 
