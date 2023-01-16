@@ -108,8 +108,11 @@ def updatePatron(userId, moddedRecord, etag, authtoken):
 
 # Read mod.jq for modifier
 
-with open('mod.jq', 'r') as file:
-    MODJQ = file.read()
+# with open('mod.jq', 'r') as file:
+#     MODJQ = file.read()
+MODJQ = '."urn:mace:oclc.org:eidm:schema:persona:persona:20180305".oclcExpirationDate = "2035-12-30T00:00:00Z"'
+# MODJQ = '.'
+
 
 BASEURL = "https://%s.share.worldcat.org/idaas/scim/v2" %INSTID
 
@@ -127,38 +130,42 @@ TOKEN = getToken()
 for line in sys.stdin:
     barcode = line.strip()
 
-    # find patron's PPID using barcode
-    try:
-        ppid =  searchPatron(barcode, TOKEN)
-    except ValueError:
-        # token has expired, get a fresh token and redo search
-        print('getting new token')
-        TOKEN = getToken()
-        ppid =  searchPatron(barcode, TOKEN)
+    if barcode == "":
+        # ignore blanks! 
+        pass
+    else:
+        # find patron's PPID using barcode
+        try:
+            ppid =  searchPatron(barcode, TOKEN)
+        except ValueError:
+            # token has expired, get a fresh token and redo search
+            print('getting new token')
+            TOKEN = getToken()
+            ppid =  searchPatron(barcode, TOKEN)
 
-    try:
-        patron = readPatron(ppid, TOKEN)
-        # for debugging
-        patronJson = json.dumps(patron.json())
-    except ValueError:
-        # token has expired, get a fresh token and redo read
-        print('getting new token')
-        TOKEN = getToken()
-        patron = readPatron(ppid, TOKEN)
+        try:
+            patron = readPatron(ppid, TOKEN)
+            # for debugging
+            patronJson = json.dumps(patron.json())
+        except ValueError:
+            # token has expired, get a fresh token and redo read
+            print('getting new token')
+            TOKEN = getToken()
+            patron = readPatron(ppid, TOKEN)
 
-    # Extract ETag for safe update
-    ETag = patron.headers['ETag']
+        # Extract ETag for safe update
+        ETag = patron.headers['ETag']
 
-    # Create modded record with MODJQ
-    modded = json.dumps(pyjq.one(MODJQ, patron.json()))
+        # Create modded record with MODJQ
+        modded = json.dumps(pyjq.one(MODJQ, patron.json()))
 
-    # Update patron record
-    try:
-        update = updatePatron(ppid, modded, ETag, TOKEN)
-        # print simple confirmation
-        print(str(barcode) + "\t" + str(update.status_code))
-    except ValueError:
-        # token has expired, get a fresh token and redo update
-        print('update getting new token')
-        TOKEN = getToken()
-        update = updatePatron(ppid, modded, ETag, TOKEN)
+        # Update patron record
+        try:
+            update = updatePatron(ppid, modded, ETag, TOKEN)
+            # print simple confirmation
+            print(str(barcode) + "\t" + str(update.status_code))
+        except ValueError:
+            # token has expired, get a fresh token and redo update
+            print('update getting new token')
+            TOKEN = getToken()
+            update = updatePatron(ppid, modded, ETag, TOKEN)

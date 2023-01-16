@@ -22,7 +22,9 @@ You will need:
   * for the Identity Management example, this will be a list of `patron barcodes`, one barcode per line, in a file called, e.g., barcodes.txt
 
 ## Setup
-Install the dependencies that have to be imported:
+The script uses `pyjq`, which is a Python wrapper for `jq`, so `jq` has to be installed first.
+
+Install the Python dependencies that will be imported by the script:
 ```
 python3 -m pip install .
 ```
@@ -48,5 +50,3 @@ will respond, on success, with output like
 12345679 200
 ...
 ```
-
-
