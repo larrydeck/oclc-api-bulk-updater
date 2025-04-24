@@ -27,18 +27,17 @@ authheader  = { 'Authorization' : 'Basic %s' %  authenc.decode() }
 url         = "https://oauth.oclc.org/token?grant_type=client_credentials&scope=SCIM"
 
 def getToken():
-
+    ''' Fetch a token from OCLC Auth server '''
     try:
-        r = requests.post(url, headers=authheader)
+        r = requests.post(url, headers=authheader, timeout=20)
         r.raise_for_status()
     except requests.exceptions.HTTPError as err:
         raise SystemExit(err)
-
     return r.json()['access_token']
 
 
 def searchPatron(patronBarcode, authtoken):
-
+    ''' Search by barcode to retrieve principal id (PPID) '''
     search  = '''
         {
             "schemas": [ "urn:ietf:params:scim:api:messages:2.0:SearchRequest" ]
@@ -49,43 +48,37 @@ def searchPatron(patronBarcode, authtoken):
     searchheaders = { 
         'Authorization' : 'Bearer %s' % authtoken
         , 'Content-Type' : 'application/scim+json'
-        , 'Accept' : 'application/scim+json' 
+        , 'Accept' : 'application/scim+json'
     }
 
     try:
-        s = requests.post(SEARCHURL, headers=searchheaders, data=search)
+        s = requests.post(SEARCHURL, headers=searchheaders, data=search, timeout=20)
         s.raise_for_status()
-    except requests.exceptions.HTTPError as err:
+    except requests.exceptions.HTTPError:
         if s.status_code == 401:
             raise ValueError('Token expired')
-        else:
-            SystemExit(err)
-
     return pyjq.first('.Resources[0].id', s.json())
 
 
 def readPatron(userId, authtoken):
-
+    ''' Get individual patron record with PPID '''
     readurl = BASEURL + '/Users/%s' % userId
 
     readheaders = {
         'Authorization' : 'Bearer %s' % authtoken
-        , 'Accept' : 'application/scim+json' 
+        , 'Accept' : 'application/scim+json'
     }
 
     try:
-        read = requests.get(readurl, headers=readheaders)
+        read = requests.get(readurl, headers=readheaders, timeout=20)
         read.raise_for_status()
-    except requests.exceptions.HTTPError as err:
+    except requests.exceptions.HTTPError:
         if read.status_code == 401:
             raise ValueError('Token expired')
-        else:
-            SystemExit(err)
-        
     return read
 
 def updatePatron(userId, moddedRecord, etag, authtoken):
-
+    ''' Update patron record using recorded modded with jq '''
     updateUrl = BASEURL + '/Users/%s' % userId
 
     updateheaders =  {
@@ -96,30 +89,22 @@ def updatePatron(userId, moddedRecord, etag, authtoken):
     }
 
     try:
-        update = requests.put(updateUrl, headers=updateheaders, data=moddedRecord)
+        update = requests.put(updateUrl, headers=updateheaders, data=moddedRecord, timeout=20)
         update.raise_for_status()
-    except requests.exceptions.HTTPError as err:
+    except requests.exceptions.HTTPError:
         if update.status_code == 401:
             raise ValueError('Token expired')
-        else:
-            SystemExit(err)
-
     return update
 
 # Read mod.jq for modifier
 
-# with open('mod.jq', 'r') as file:
-#     MODJQ = file.read()
-MODJQ = '."urn:mace:oclc.org:eidm:schema:persona:persona:20180305".oclcExpirationDate = "2035-12-30T00:00:00Z"'
-# MODJQ = '.'
+with open('mod.jq', 'r') as file:
+    MODJQ = file.read()
 
 
 BASEURL = "https://%s.share.worldcat.org/idaas/scim/v2" %INSTID
 
 SEARCHURL = BASEURL + '/Users/.search'
-
-# old token to test refresh
-# TOKEN = "tk_vziB66LUGsTrc0MRpml5yo4VYoKWUPTvUXfj"
 
 TOKEN = getToken()
 
